@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div class="game-controls">
+            Press SPACE or CLICK to play
+        </div>
+    </div>
+
+    <audio id="audioNone" preload="none"></audio>
+    <audio id="audioTrack1" preload="auto" loop>
+        <source src="assets/audio/ToneOfTime_-_MONTAGEM_RUGADA_Super_Slow_(mp3.pm).mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioTrack2" preload="auto" loop>
+        <source src="assets/audio/TheFatRat_-_Never_Be_Alone_(mp3.pm).mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioTrack3" preload="auto" loop>
+        <source src="assets/audio/Robin Hustin, Tobimorrow - Light It Up [NCS Release].mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioTrack4" preload="auto" loop>
+        <source src="assets/audio/FUFUFAFA_-_MONTAGEM_XONADA_-_Momoi_Version_Bass_Boosted_(mp3.pm).mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioGameOver" preload="auto">
+        <source src="assets/audio/maka-bhosda-aag-meme-amitabh-bachan-made-with-Voicemod.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audioFall" preload="auto">
+        <source src="assets/audio/bharva-hai.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Intro Screen -->
+    <div id="introScreen" class="screen active">
+        <!-- Animated Background -->
+        <div class="background-animation">
+            <div class="pipe pipe-1"></div>
+            <div class="pipe pipe-2"></div>
+            <div class="pipe pipe-3"></div>
+            <div class="cloud cloud-1"></div>
+            <div class="cloud cloud-2"></div>
+            <div class="cloud cloud-3"></div>
+        </div>
+        
+        <div class="intro-content">
+            <div class="bird-emoji">🐦</div>
+            <h1>FLAPPY BIRD</h1>
+            <p>Navigate through the pipes and achieve high scores!</p>
+            
+            <!-- Statistics Section -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-label">Best Score</div>
+                    <div class="stat-value" id="homeBestScore">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Games Played</div>
+                    <div class="stat-value" id="homeGamesPlayed">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Score</div>
+                    <div class="stat-value" id="homeTotalScore">0</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="game.startGame()">Start Game</button>
+        </div>
+    </div>
+
+    <!-- Menu Screen -->
+    <div id="menuScreen" class="screen">
+        <div class="menu-content">
+            <h1>FLAPPY BIRD</h1>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="game.startGame()">▶ Play</button>
+                <button class="btn btn-secondary" onclick="game.showSettings()">⚙ Settings</button>
+                <button class="btn btn-tertiary" onclick="game.showHighScore()">🏆 High Score</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settingsScreen" class="screen">
+        <div class="settings-content">
+            <h2>⚙ Settings</h2>
+            
+            <div class="setting-item">
+                <label>Difficulty</label>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn active" data-difficulty="easy" onclick="game.setDifficulty('easy')">Easy</button>
+                    <button class="difficulty-btn" data-difficulty="medium" onclick="game.setDifficulty('medium')">Medium</button>
+                    <button class="difficulty-btn" data-difficulty="hard" onclick="game.setDifficulty('hard')">Hard</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <label>Background Music</label>
+                <div class="music-control">
+                    <button class="arrow-btn" onclick="game.prevTrack()">◀</button>
+                    <div class="track-display">
+                        <span id="currentTrackName">Off</span>
+                    </div>
+                    <button class="arrow-btn" onclick="game.nextTrack()">▶</button>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <label>Sound Volume</label>
+                <div class="volume-control">
+                    <span>🔇</span>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="50" onchange="game.setVolume(this.value)">
+                    <span>🔊</span>
+                    <div class="volume-value"><span id="volumeValue">50</span>%</div>
+                </div>
+            </div>
+
+            <div class="settings-buttons">
+                <button class="btn btn-primary" onclick="game.showMenu()">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pause Screen -->
+    <div id="pauseScreen" class="screen">
+        <div class="pause-content">
+            <h2>PAUSED</h2>
+            <p>Press ESC to resume</p>
+            <div class="pause-buttons">
+                <button class="btn btn-primary" onclick="game.resumeGame()">Resume</button>
+                <button class="btn btn-secondary" onclick="game.showMenu()">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen">
+        <div class="gameover-content">
+            <h2>GAME OVER</h2>
+            <div class="score-display">
+                <span class="label">Your Score:</span>
+                <div class="score-value" id="finalScore">0</div>
+            </div>
+            <div class="highscore-display">
+                <span class="label">High Score:</span>
+                <div class="score-value" id="highScoreDisplay">0</div>
+            </div>
+            <div class="gameover-buttons">
+                <button class="btn btn-primary" onclick="game.startGame()">Play Again</button>
+                <button class="btn btn-secondary" onclick="game.showSettings()">Settings</button>
+                <button class="btn btn-tertiary" onclick="game.showMenu()">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- High Score Screen -->
+    <div id="highScoreScreen" class="screen">
+        <div class="highscore-content">
+            <h2>🏆 High Score</h2>
+            <div class="medal" id="medal">🎖️</div>
+            <div class="high-score-value" id="hsValue">0</div>
+            <button class="btn btn-primary" onclick="game.showMenu()">Back to Menu</button>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script></script>
+</body>
+</html>
